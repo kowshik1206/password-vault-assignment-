@@ -32,7 +32,6 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<VaultEntry | null>(null);
-  const [isSample, setIsSample] = useState(false);
 
   const sampleEntries: VaultEntry[] = [
     {
@@ -57,30 +56,6 @@ export default function Dashboard() {
       username: 'user@twitter.com',
       password: encrypt('password123'),
       url: 'https://twitter.com',
-      notes: 'This is a sample entry.'
-    },
-    {
-      _id: 'sample-4',
-      title: 'GitHub',
-      username: 'user@github.com',
-      password: encrypt('password123'),
-      url: 'https://github.com',
-      notes: 'This is a sample entry.'
-    },
-    {
-      _id: 'sample-5',
-      title: 'LinkedIn',
-      username: 'user@linkedin.com',
-      password: encrypt('password123'),
-      url: 'https://linkedin.com',
-      notes: 'This is a sample entry.'
-    },
-    {
-      _id: 'sample-6',
-      title: 'Netflix',
-      username: 'user@netflix.com',
-      password: encrypt('password123'),
-      url: 'https://netflix.com',
       notes: 'This is a sample entry.'
     },
   ];
@@ -179,10 +154,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="py-4 px-8 flex justify-between items-center border-b border-border">
-        <h1 className="text-3xl font-bold">Password Vault</h1>
+      <header className="py-4 px-8 flex justify-between items-center border-b border-border shadow-sm">
+        <h1 className="text-3xl font-bold text-primary">Password Vault</h1>
         <div className="flex items-center space-x-4">
-          <p className="text-muted-foreground">Welcome, {user?.email}</p>
+          <p className="text-muted-foreground hidden sm:block">Welcome, {user?.email}</p>
           <ThemeToggleButton />
           <button onClick={handleLogout} className="px-4 py-2 font-medium text-white bg-destructive rounded-md hover:bg-destructive/90 transition-colors">
             Logout
@@ -204,7 +179,7 @@ export default function Dashboard() {
       </main>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
           <NewEntryForm 
             userId={user?._id}
             entryToEdit={editingEntry}
