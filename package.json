@@ -12,6 +12,7 @@
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
     "crypto-js": "^4.2.0",
+    "framer-motion": "^12.23.22",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.20.0",

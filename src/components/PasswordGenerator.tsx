@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function PasswordGenerator() {
   const [length, setLength] = useState(12);
@@ -10,6 +11,21 @@ export default function PasswordGenerator() {
   const [excludeLookalikes, setExcludeLookalikes] = useState(true);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
+  const [strength, setStrength] = useState(0);
+
+  const calculateStrength = () => {
+    let score = 0;
+    if (length >= 12) score++;
+    if (length >= 16) score++;
+    if (includeUppercase) score++;
+    if (includeNumbers) score++;
+    if (includeSymbols) score++;
+    setStrength(score);
+  };
+
+  useEffect(() => {
+    calculateStrength();
+  }, [length, includeUppercase, includeNumbers, includeSymbols]);
 
   const generatePassword = () => {
     const lowercaseChars = "abcdefghijkmnopqrstuvwxyz"; // Excluded l
@@ -41,9 +57,17 @@ export default function PasswordGenerator() {
     }
   };
 
+  const strengthColors = [
+    "bg-red-500",
+    "bg-orange-500",
+    "bg-yellow-500",
+    "bg-lime-500",
+    "bg-green-500",
+  ];
+
   return (
-    <div className="w-full p-6 space-y-6 bg-card text-card-foreground rounded-2xl shadow-lg border border-border">
-      <h2 className="text-2xl font-bold text-center">Password Generator</h2>
+    <div className="w-full p-6 space-y-6 glass-card rounded-2xl shadow-lg">
+      <h2 className="text-2xl font-bold text-center text-foreground">Password Generator</h2>
 
       <div className="relative flex items-center">
         <input
@@ -51,7 +75,7 @@ export default function PasswordGenerator() {
           readOnly
           value={password}
           placeholder="Your generated password"
-          className="w-full p-4 pr-24 text-lg bg-muted border border-input rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-primary truncate"
+          className="w-full p-4 pr-24 text-lg bg-muted/50 border border-input rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-primary truncate"
         />
         <button
           onClick={copyToClipboard}
@@ -78,6 +102,15 @@ export default function PasswordGenerator() {
           onChange={(e) => setLength(parseInt(e.target.value))}
           className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
         />
+
+        <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+          <motion.div 
+            className={`h-full ${strengthColors[strength -1]}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${(strength / 5) * 100}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
           <label className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-colors">
