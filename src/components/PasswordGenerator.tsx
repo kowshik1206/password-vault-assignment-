@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
@@ -66,8 +68,8 @@ export default function PasswordGenerator() {
   ];
 
   return (
-    <div className="w-full p-6 space-y-6 glass-card rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-bold text-center text-foreground">Password Generator</h2>
+    <div className="w-full p-6 space-y-6 bg-card text-card-foreground rounded-2xl shadow-lg border border-border">
+      <h2 className="text-2xl font-bold text-center">Password Generator</h2>
 
       <div className="relative flex items-center">
         <input
@@ -75,7 +77,7 @@ export default function PasswordGenerator() {
           readOnly
           value={password}
           placeholder="Your generated password"
-          className="w-full p-4 pr-24 text-lg bg-muted/50 border border-input rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-primary truncate"
+          className="w-full p-4 pr-24 text-lg bg-muted border border-input rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-primary truncate"
         />
         <button
           onClick={copyToClipboard}

@@ -22,7 +22,7 @@ export default function Vault({ entries, onAddEntry, onEditEntry, onDeleteEntry 
   );
 
   return (
-    <div className="space-y-6 glass-card p-6 rounded-2xl shadow-lg">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-foreground">My Vault</h2>
         <button 
@@ -39,7 +39,7 @@ export default function Vault({ entries, onAddEntry, onEditEntry, onDeleteEntry 
           placeholder="Search vault..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-lg border-input focus:outline-none focus:ring-2 focus:ring-primary transition-shadow duration-300 shadow-sm"
+          className="w-full pl-10 pr-4 py-3 bg-card border rounded-lg border-input focus:outline-none focus:ring-2 focus:ring-primary transition-shadow duration-300 shadow-sm"
         />
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       </div>

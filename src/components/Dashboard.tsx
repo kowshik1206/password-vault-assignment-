@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import PasswordGenerator from "./PasswordGenerator";
 import Vault from "./Vault";
 import NewEntryForm from "./NewEntryForm";
@@ -156,7 +155,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="aurora-bg"></div>
-      <header className="py-4 px-8 flex justify-between items-center border-b border-border/20 shadow-sm glass-card">
+      <header className="py-4 px-8 flex justify-between items-center border-b border-border/20 shadow-sm">
         <h1 className="text-3xl font-bold text-primary">Password Vault</h1>
         <div className="flex items-center space-x-4">
           <p className="text-muted-foreground hidden sm:block">Welcome, {user?.email}</p>
@@ -166,28 +165,20 @@ export default function Dashboard() {
           </button>
         </div>
       </header>
-      <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-8">
-        <motion.div 
-          className="lg:col-span-4"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <PasswordGenerator />
-        </motion.div>
-        <motion.div 
-          className="lg:col-span-8"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Vault 
-            entries={entries} 
-            onAddEntry={handleAddEntryClick}
-            onEditEntry={handleEditEntryClick}
-            onDeleteEntry={handleDeleteEntry}
-          />
-        </motion.div>
+      <main className="p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-4">
+            <PasswordGenerator />
+          </div>
+          <div className="lg:col-span-8">
+            <Vault 
+              entries={entries} 
+              onAddEntry={handleAddEntryClick}
+              onEditEntry={handleEditEntryClick}
+              onDeleteEntry={handleDeleteEntry}
+            />
+          </div>
+        </div>
       </main>
 
       {isModalOpen && (
