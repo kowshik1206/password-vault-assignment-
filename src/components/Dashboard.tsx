@@ -1,0 +1,218 @@
+'use client';
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import PasswordGenerator from "./PasswordGenerator";
+import Vault from "./Vault";
+import NewEntryForm from "./NewEntryForm";
+import { ThemeToggleButton } from "./ThemeToggleButton";
+
+import { encrypt } from "@/lib/crypto";
+
+// Define types for our data
+interface User {
+  _id: string;
+  email: string;
+}
+
+export interface VaultEntry {
+  _id: string;
+  title: string;
+  username: string;
+  password: string; // Encrypted
+  url: string;
+  notes?: string;
+}
+
+export default function Dashboard() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [entries, setEntries] = useState<VaultEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<VaultEntry | null>(null);
+  const [isSample, setIsSample] = useState(false);
+
+  const sampleEntries: VaultEntry[] = [
+    {
+      _id: 'sample-1',
+      title: 'Google',
+      username: 'user@gmail.com',
+      password: encrypt('password123'),
+      url: 'https://google.com',
+      notes: 'This is a sample entry.'
+    },
+    {
+      _id: 'sample-2',
+      title: 'Facebook',
+      username: 'user@facebook.com',
+      password: encrypt('password123'),
+      url: 'https://facebook.com',
+      notes: 'This is a sample entry.'
+    },
+    {
+      _id: 'sample-3',
+      title: 'Twitter',
+      username: 'user@twitter.com',
+      password: encrypt('password123'),
+      url: 'https://twitter.com',
+      notes: 'This is a sample entry.'
+    },
+    {
+      _id: 'sample-4',
+      title: 'GitHub',
+      username: 'user@github.com',
+      password: encrypt('password123'),
+      url: 'https://github.com',
+      notes: 'This is a sample entry.'
+    },
+    {
+      _id: 'sample-5',
+      title: 'LinkedIn',
+      username: 'user@linkedin.com',
+      password: encrypt('password123'),
+      url: 'https://linkedin.com',
+      notes: 'This is a sample entry.'
+    },
+    {
+      _id: 'sample-6',
+      title: 'Netflix',
+      username: 'user@netflix.com',
+      password: encrypt('password123'),
+      url: 'https://netflix.com',
+      notes: 'This is a sample entry.'
+    },
+  ];
+
+  const fetchEntries = async (userId: string) => {
+    try {
+      const entriesRes = await fetch(`/api/vault?userId=${userId}`);
+      if (!entriesRes.ok) throw new Error('Failed to fetch vault entries');
+      const entriesData = await entriesRes.json();
+      const userEntries = entriesData.data;
+      const combinedEntries = [...sampleEntries, ...userEntries.filter((entry: VaultEntry) => !sampleEntries.find(se => se._id === entry._id))];
+      setEntries(combinedEntries);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching entries');
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userRes = await fetch('/api/auth/me');
+        if (!userRes.ok) {
+          router.push('/login');
+          return;
+        }
+        const userData = await userRes.json();
+        setUser(userData.data);
+        await fetchEntries(userData.data._id);
+      } catch (err: any) {
+        setError(err.message || 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [router]);
+
+  const handleAddEntryClick = () => {
+    setEditingEntry(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditEntryClick = (entry: VaultEntry) => {
+    setEditingEntry(entry);
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = async () => {
+    if (user) {
+      await fetchEntries(user._id);
+    }
+    setIsModalOpen(false);
+    setEditingEntry(null);
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    if (entryId.startsWith('sample-')) {
+        setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryId));
+        return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this entry?")) return;
+
+    try {
+      const res = await fetch(`/api/vault/${entryId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryId));
+      } else {
+        alert('Failed to delete entry.');
+      }
+    } catch (err) {
+      alert('An error occurred while deleting the entry.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (err) {
+      alert('Logout failed.');
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="flex items-center justify-center min-h-screen text-destructive">Error: {error}</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="py-4 px-8 flex justify-between items-center border-b border-border">
+        <h1 className="text-3xl font-bold">Password Vault</h1>
+        <div className="flex items-center space-x-4">
+          <p className="text-muted-foreground">Welcome, {user?.email}</p>
+          <ThemeToggleButton />
+          <button onClick={handleLogout} className="px-4 py-2 font-medium text-white bg-destructive rounded-md hover:bg-destructive/90 transition-colors">
+            Logout
+          </button>
+        </div>
+      </header>
+      <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-8">
+        <div className="lg:col-span-4">
+          <PasswordGenerator />
+        </div>
+        <div className="lg:col-span-8">
+          <Vault 
+            entries={entries} 
+            onAddEntry={handleAddEntryClick}
+            onEditEntry={handleEditEntryClick}
+            onDeleteEntry={handleDeleteEntry}
+          />
+        </div>
+      </main>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <NewEntryForm 
+            userId={user?._id}
+            entryToEdit={editingEntry}
+            onFormSubmit={handleFormSubmit} 
+            onClose={() => setIsModalOpen(false)} 
+          />
+        </div>
+      )}
+    </div>
+  );
+}
