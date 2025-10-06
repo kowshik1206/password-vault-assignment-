@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [entries, setEntries] = useState<VaultEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<VaultEntry | null>(null);
   
@@ -72,7 +71,7 @@ export default function Dashboard() {
       const combinedEntries = [...sampleEntries, ...userEntries.filter((entry: VaultEntry) => !sampleEntries.find(se => se._id === entry._id))];
       setEntries(combinedEntries);
     } catch (err: any) {
-      setError(err.message || 'An error occurred while fetching entries');
+      toast.error(err.message || 'An error occurred while fetching entries');
     }
   };
 
@@ -88,14 +87,14 @@ export default function Dashboard() {
         setUser(userData.data);
         await fetchEntries(userData.data._id);
       } catch (err: any) {
-        setError(err.message || 'An error occurred');
+        toast.error(err.message || 'An error occurred');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, [router]);
+  }, [router, isModalOpen]);
 
   
 
@@ -161,10 +160,6 @@ export default function Dashboard() {
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="flex items-center justify-center min-h-screen text-destructive">Error: {error}</div>;
   }
 
   return (

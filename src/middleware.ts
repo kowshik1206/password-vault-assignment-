@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose';
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get('auth_token')?.value;
   const { pathname } = request.nextUrl;
 
   // If trying to access auth pages while logged in, redirect to home
@@ -29,20 +29,12 @@ export async function middleware(request: NextRequest) {
       await jwtVerify(token, secret);
     } catch (err) {
       const response = NextResponse.redirect(new URL('/login', request.url));
-      response.cookies.delete('token'); // Delete invalid token
+      response.cookies.delete('auth_token'); // Delete invalid token
       return response;
     }
   }
 
-  const response = NextResponse.next();
-
-  // Add Content Security Policy header allowing unsafe-eval
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
-  );
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
