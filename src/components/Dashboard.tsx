@@ -7,6 +7,7 @@ import Vault from "./Vault";
 import NewEntryForm from "./NewEntryForm";
 
 import { ThemeToggleButton } from "./ThemeToggleButton";
+import { toast } from "sonner";
 
 import { encrypt } from "@/lib/crypto";
 
@@ -119,24 +120,34 @@ export default function Dashboard() {
   const handleDeleteEntry = async (entryId: string) => {
     if (entryId.startsWith('sample-')) {
         setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryId));
+        toast.success('Sample entry removed.');
         return;
     }
 
-    if (!window.confirm("Are you sure you want to delete this entry?")) return;
-
-    try {
-      const res = await fetch(`/api/vault/${entryId}`, {
-        method: 'DELETE',
-      });
-
-      if (res.ok) {
-        setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryId));
-      } else {
-        alert('Failed to delete entry.');
-      }
-    } catch (err) {
-      alert('An error occurred while deleting the entry.');
-    }
+    toast('Are you sure you want to delete this entry?', {
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            const res = await fetch(`/api/vault/${entryId}`, {
+              method: 'DELETE',
+            });
+      
+            if (res.ok) {
+              setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryId));
+              toast.success('Entry deleted successfully!');
+            } else {
+              toast.error('Failed to delete entry.');
+            }
+          } catch (err) {
+            toast.error('An error occurred while deleting the entry.');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+      },
+    });
   };
 
   const handleLogout = async () => {
@@ -144,7 +155,7 @@ export default function Dashboard() {
       await fetch('/api/auth/logout', { method: 'POST' });
       router.push('/login');
     } catch (err) {
-      alert('Logout failed.');
+      toast.error('Logout failed.');
     }
   };
 

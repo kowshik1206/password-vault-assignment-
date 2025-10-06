@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { encrypt } from '@/lib/crypto';
 import { VaultEntry } from './Dashboard';
+import { toast } from 'sonner';
 
 interface EntryFormProps {
   userId?: string;
@@ -74,13 +75,14 @@ export default function NewEntryForm({ userId, entryToEdit, onFormSubmit, onClos
       });
 
       if (res.ok) {
+        toast.success(isEditMode ? 'Entry updated successfully!' : 'Entry added successfully!');
         onFormSubmit();
       } else {
         const data = await res.json();
-        setError(data.message || `Failed to ${isEditMode ? 'update' : 'add'} entry`);
+        toast.error(data.message || `Failed to ${isEditMode ? 'update' : 'add'} entry`);
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      toast.error('An unexpected error occurred');
     }
 
     setLoading(false);
@@ -94,7 +96,7 @@ export default function NewEntryForm({ userId, entryToEdit, onFormSubmit, onClos
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-muted-foreground">Title</label>
-          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 mt-1 bg-transparent border rounded-md border-input text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+          <input type="text" required value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 mt-1 bg-transparent border rounded-md border-input text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring" autoFocus />
         </div>
         <div>
           <label className="block text-sm font-medium text-muted-foreground">Username</label>
@@ -112,7 +114,7 @@ export default function NewEntryForm({ userId, entryToEdit, onFormSubmit, onClos
           <label className="block text-sm font-medium text-muted-foreground">Notes</label>
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className="w-full px-3 py-2 mt-1 bg-transparent border rounded-md border-input text-card-foreground focus:outline-none focus:ring-2 focus:ring-ring"></textarea>
         </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        
         <button type="submit" disabled={loading} className="w-full px-4 py-2 font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 transition-colors">
           {loading ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Entry')}
         </button>
