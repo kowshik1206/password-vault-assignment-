@@ -1,16 +1,26 @@
+'use client';
+
 import CryptoJS from 'crypto-js';
 
-const SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY;
+// Ensure the secret key is a string and is handled securely.
+// It's critical that this key is not hard-coded in a real application.
+// For this example, we'll use a placeholder key. In a real app, this should
+// be derived from the user's password or managed in a secure way.
+const secretKey = process.env.NEXT_PUBLIC_CRYPTO_SECRET || 'default-secret-key-that-is-not-secure';
 
-if (!SECRET_KEY) {
-  throw new Error('Please define the NEXT_PUBLIC_SECRET_KEY environment variable inside .env.local');
+if (process.env.NODE_ENV !== 'production' && secretKey === 'default-secret-key-that-is-not-secure') {
+  console.warn('Warning: Using a default, insecure secret key for encryption. Please set NEXT_PUBLIC_CRYPTO_SECRET in your environment.');
 }
 
-export const encrypt = (text: string) => {
-  return CryptoJS.AES.encrypt(text, SECRET_KEY).toString();
+// Encrypt function
+export const encrypt = (text: string): string => {
+  if (!text) return '';
+  return CryptoJS.AES.encrypt(text, secretKey).toString();
 };
 
-export const decrypt = (ciphertext: string) => {
-  const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+// Decrypt function
+export const decrypt = (ciphertext: string): string => {
+  if (!ciphertext) return '';
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);
 };

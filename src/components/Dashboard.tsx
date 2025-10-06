@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import PasswordGenerator from "./PasswordGenerator";
 import Vault from "./Vault";
 import NewEntryForm from "./NewEntryForm";
+
 import { ThemeToggleButton } from "./ThemeToggleButton";
 
 import { encrypt } from "@/lib/crypto";
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<VaultEntry | null>(null);
+  
 
   const sampleEntries: VaultEntry[] = [
     {
@@ -93,6 +95,8 @@ export default function Dashboard() {
 
     fetchUser();
   }, [router]);
+
+  
 
   const handleAddEntryClick = () => {
     setEditingEntry(null);
@@ -180,8 +184,7 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-
-      {isModalOpen && (
+{isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
           <NewEntryForm 
             userId={user?._id}

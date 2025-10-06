@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { VaultEntry } from './Dashboard';
 import VaultItem from './VaultItem';
-import { VaultEntry } from './Dashboard'; // Import the type from Dashboard
 
 interface VaultProps {
   entries: VaultEntry[];
@@ -17,8 +17,8 @@ export default function Vault({ entries, onAddEntry, onEditEntry, onDeleteEntry 
 
   const filteredEntries = entries.filter(entry => 
     entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (entry.username && entry.username.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (entry.url && entry.url.toLowerCase().includes(searchTerm.toLowerCase()))
+    entry.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    entry.url.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
