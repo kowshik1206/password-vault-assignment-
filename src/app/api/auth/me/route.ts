@@ -1,30 +1,29 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import { getCookie } from 'cookies-next';
+import jwt from 'jsonwebtoken';
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
-export async function GET(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
-
-  if (!token) {
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-  }
-
+export async function GET(request: Request) {
   try {
-    await dbConnect();
-    const { payload } = await jwtVerify(token, secret);
-    const { userId } = payload as { userId: string };
-    const user = await User.findById(userId).select('-password'); // Exclude password from result
+    const token = getCookie('auth_token', { req: request as any });
 
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+    if (!token) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json({ success: true, data: user });
-  } catch (err) {
-    return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 401 });
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is not defined');
+    }
+
+    const decoded = jwt.verify(token, jwtSecret);
+
+    return NextResponse.json({ success: true, data: decoded }, { status: 200 });
+
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+    }
+    console.error('Me Error:', error);
+    return NextResponse.json({ message: 'An internal server error occurred' }, { status: 500 });
   }
 }

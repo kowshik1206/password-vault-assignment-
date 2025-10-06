@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
-import { serialize } from 'cookie';
+import { deleteCookie } from 'cookies-next';
 
-export async function POST() {
-  // To log out, we overwrite the token cookie with an empty value and an expiry date in the past.
-  const serializedCookie = serialize('token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: -1, // Expire immediately
-    path: '/',
-  });
+export async function POST(request: Request) {
+  try {
+    const response = NextResponse.json({ success: true, message: 'Logout successful' }, { status: 200 });
+    
+    deleteCookie('auth_token', {
+      req: request as any,
+      res: response,
+      path: '/',
+    });
 
-  const response = NextResponse.json({ success: true, message: "Logout successful" });
-  response.headers.set('Set-Cookie', serializedCookie);
+    return response;
 
-  return response;
+  } catch (error) {
+    console.error('Logout Error:', error);
+    return NextResponse.json({ message: 'An internal server error occurred' }, { status: 500 });
+  }
 }
