@@ -13,7 +13,7 @@ import { encrypt } from "@/lib/crypto";
 
 // Define types for our data
 interface User {
-  _id: string;
+  id: string;
   email: string;
 }
 
@@ -85,7 +85,7 @@ export default function Dashboard() {
         }
         const userData = await userRes.json();
         setUser(userData.data);
-        await fetchEntries(userData.data._id);
+        await fetchEntries(userData.data.id);
       } catch (err: any) {
         toast.error(err.message || 'An error occurred');
       } finally {
@@ -193,7 +193,7 @@ export default function Dashboard() {
 {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 animate-fade-in">
           <NewEntryForm 
-            userId={user?._id}
+            userId={user?.id}
             entryToEdit={editingEntry}
             onFormSubmit={handleFormSubmit} 
             onClose={() => setIsModalOpen(false)} 
