@@ -110,7 +110,7 @@ export default function Dashboard() {
 
   const handleFormSubmit = async () => {
     if (user) {
-      await fetchEntries(user._id);
+      await fetchEntries(user.id);
     }
     setIsModalOpen(false);
     setEditingEntry(null);
