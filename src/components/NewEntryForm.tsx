@@ -9,7 +9,7 @@ interface EntryFormProps {
   userId?: string;
   entryToEdit?: VaultEntry | null;
   onFormSubmit: () => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function NewEntryForm({ userId, entryToEdit, onFormSubmit, onClose }: EntryFormProps) {
@@ -90,7 +90,7 @@ export default function NewEntryForm({ userId, entryToEdit, onFormSubmit, onClos
 
   return (
     <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg relative">
-      <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">&times;</button>
+      {onClose && <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">&times;</button>}
       
       <h2 className="text-2xl font-bold text-center text-card-foreground">{isEditMode ? 'Edit Entry' : 'Add New Entry'}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
