@@ -3,7 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { setCookie } from 'cookies-next';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -36,11 +36,7 @@ export async function POST(request: Request) {
       { expiresIn: '1d' } // Token expires in 1 day
     );
 
-    const response = NextResponse.json({ success: true, message: 'Login successful' }, { status: 200 });
-    
-    setCookie('auth_token', token, {
-      req: request as any, // Type assertion to satisfy cookies-next
-      res: response,
+    cookies().set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -48,7 +44,7 @@ export async function POST(request: Request) {
       path: '/',
     });
 
-    return response;
+    return NextResponse.json({ success: true, message: 'Login successful' }, { status: 200 });
 
   } catch (error) {
     console.error('Login Error:', error);
